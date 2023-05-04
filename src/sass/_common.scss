@@ -1,13 +1,92 @@
 @import '~node_modules/modern-normalize/modern-normalize.css';
 
 body {
-    width: 1400px
+  width: 1400px;
 }
+
+.form-container {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 30px;
+  background-color: #43a137;
+  display: flex;
+  align-items: center;
+  justify-items: center;
+}
+
 .search-form {
+  display: flex;
+  align-items: center;
+  justify-items: center;
+  gap: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  &-input {
+    width: 200px;
+    height: 20px;
+  }
 
+  &-button {
+    border-radius: 10%;
+    border-color: transparent;
+    height: 20px;
+    text-align: center;
+  }
+}
+
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+
+  &__item {
+    display: block;
+    height: 150px;
+    width: 100%px;
+  }
+
+  &__image {
+    display: block;
     width: 100%;
-    height: 50px;
-    background-color: #43a137;
-    display: flex;
+    height: 100%;
+    object-fit: cover;
+  }
+}
 
+.photo-card {
+  display: block;
+  box-sizing: border-box;
+  height: 200px;
+  margin: 10px;
+  padding: 5px;
+  width: calc((1400px - 5 * 20px) / 5);
+  box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
+    0px 1px 1px 0px rgba(0, 0, 0, 0.14), 0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+  transition: transform var(--animation-duration) var(--timing-function);
+}
+
+.photo-card:hover {
+  transform: scale(1.03);
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 35px;
+
+  &-item {
+    display: block;
+    margin: 0px;
+    text-align: center;
+    font-size: 12px;
+  }
+}
+
+.load-more {
+  display: block;
+  align-items: center;
+  text-align: center;
+  background-color: blue;
+  color: azure;
+  font-weight: bold;
 }

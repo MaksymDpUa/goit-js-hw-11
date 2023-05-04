@@ -1,5 +1,7 @@
 import axios from 'axios';
 import Notiflix from 'notiflix';
+import SimpleLightbox from "simplelightbox";
+import "simplelightbox/dist/simple-lightbox.min.css";
 
 const form = document.querySelector('.search-form');
 const gallery = document.querySelector('.gallery');
@@ -7,8 +9,14 @@ const loadMoreBtn = document.querySelector('.load-more');
 const API_KEY = '35914850-286d914d1efc8c48d6a511ecc';
 const URL = 'https://pixabay.com/api/';
 
+  const lightbox = new SimpleLightbox(".gallery a", {
+    captionsData: "alt",
+    captionDelay: 250,
+  });
+
 form.addEventListener('submit', onSubmit);
-loadMoreBtn.addEventListener('click', onClick);
+// loadMoreBtn.addEventListener('click', onClick);
+gallery.addEventListener("click", onClick);
 
 let currentPage = 1;
 let query = '';
@@ -17,7 +25,7 @@ let query = '';
 function onSubmit(evt) {
   evt.preventDefault();
   query = evt.target.elements.searchQuery.value.trim();
-    loadMoreBtn.hidden = true;
+    // loadMoreBtn.hidden = true;
     gallery.innerHTML = "";
     currentPage = 1;
 
@@ -27,13 +35,20 @@ function onSubmit(evt) {
 
   search(query).then(imagies => {
     createMarkUp(imagies.hits);
+      lightbox.refresh();
 
-    if (imagies.hits.length >= 40) {
-      loadMoreBtn.hidden = false;
-    } else if (currentPage > 12) {
-      loadMoreBtn.hidden = true;
-    }
+      console.dir(gallery.firstElementChild.getBoundingClientRect());
+    // if (imagies.hits.length >= 40) {
+    //   loadMoreBtn.hidden = false;
+    // } else if (currentPage > 12) {
+    //   loadMoreBtn.hidden = true;
+    // }
+scroll()
+     
   });
+    
+
+
 }
 
 async function search(query) {
@@ -80,8 +95,8 @@ function createMarkUp(imagies) {
         comments,
         downloads,
       } = image;
-      return `<div class="photo-card">
-  <img src="${webformatURL}" alt="${tags}" loading="lazy" width="300" min-height="300"/>
+      return `<div class="photo-card"><a href="${largeImageURL}" class="gallery__item"><img src="${webformatURL}" alt="${tags}" loading="lazy"  class="gallery__image"/></a>
+  
   <div class="info">
     <p class="info-item">
       <b>Likes: ${likes}</b>
@@ -96,14 +111,35 @@ function createMarkUp(imagies) {
       <b>Downloads: ${downloads}</b>
     </p>
   </div>
-</div>`;
-    })
-    .join();
+</div>`})
+    .join("");
   gallery.insertAdjacentHTML('beforeend', markUp);
 }
 
-function onClick() {
-  currentPage += 1;
-  console.log(currentPage);
-  search(query).then(imagies => createMarkUp(imagies.hits));
+// function onClick() {
+//   currentPage += 1;
+//   console.log(currentPage);
+//   search(query).then(imagies => createMarkUp(imagies.hits));
+// lightbox.refresh()
+// }
+
+
+function onClick(event) {
+  event.preventDefault();
+  if (!event.target.classList.contains("gallery__image")) {
+    return;
+  }
+ 
+
+  lightbox.open();
 }
+function scroll() {
+     const { height: cardHeight } = gallery
+  .firstElementChild.getBoundingClientRect();
+
+window.scrollBy({
+  top: cardHeight * 2,
+  behavior: "smooth",
+});
+}
+    
