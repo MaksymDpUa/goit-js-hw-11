@@ -27,24 +27,34 @@ const maxPages = 12;
 let currentPage = 1;
 let query = '';
 
-function onSubmit(evt) {
+
+async function onSubmit(evt) {
   evt.preventDefault();
   query = evt.target.elements.searchQuery.value.trim();
-
   gallery.innerHTML = '';
   currentPage = 1;
 
   if (query === '') {
     return;
+    }
+    
+  const imagies = await search(query);
+
+  if (!imagies.hits.length) {
+    Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    );
+  } else {
+    Notiflix.Notify.success(`Hooray! We found ${imagies.totalHits} images.`);
   }
 
-  search(query).then(imagies => {
-    createMarkUp(imagies.hits);
-    lightbox.refresh();
-    observer.observe(guard);
+  const markUp = await createMarkUp(imagies.hits);
+  gallery.insertAdjacentHTML('beforeend', markUp);
+
+  lightbox.refresh();
+  observer.observe(guard);
 
     scroll();
-  });
 }
 
 async function search(query) {
@@ -62,18 +72,11 @@ async function search(query) {
       Headers: {
         'Content-Type': 'aplication/json',
       },
-      };
-      
+    };
+
     const response = await axios.get(`${URL}`, config);
     const imagies = response.data;
 
-    if (!imagies.hits.length) {
-      Notiflix.Notify.failure(
-        'Sorry, there are no images matching your search query. Please try again.'
-      );
-    } else {
-      Notiflix.Notify.success(`Hooray! We found ${imagies.totalHits} images.`);
-    }
     return imagies;
   } catch (error) {
     console.log(error);
@@ -92,8 +95,8 @@ function createMarkUp(imagies) {
         comments,
         downloads,
       } = image;
-      return `<div class="photo-card"><a href="${largeImageURL}" class="gallery__item"><img src="${webformatURL}" alt="${tags}" loading="lazy"  class="gallery__image"/></a>
-  
+      return `<div class="photo-card"><a href="${largeImageURL}" class="gallery__item">
+      <img src="${webformatURL}" alt="${tags}" loading="lazy"  class="gallery__image"/></a>  
   <div class="info">
     <p class="info-item">
       <b>Likes: ${likes}</b>
@@ -111,7 +114,7 @@ function createMarkUp(imagies) {
 </div>`;
     })
     .join('');
-  gallery.insertAdjacentHTML('beforeend', markUp);
+  return markUp;
 }
 
 function onClick(event) {
@@ -132,15 +135,17 @@ function scroll() {
   });
 }
 
-function onPagination(entries, observer) {
-  entries.forEach(entry => {
-    console.log(entries);
+
+
+async function onPagination(entries, observer) {
+  entries.forEach(async entry => {
     if (entry.isIntersecting) {
       currentPage += 1;
-      search(query).then(imagies => {
-        createMarkUp(imagies.hits);
-        lightbox.refresh();
-      });
+      const imagies = await search(query);
+      const markUp = await createMarkUp(imagies.hits);
+      gallery.insertAdjacentHTML('beforeend', markUp);
+
+      lightbox.refresh();
     }
     if (currentPage > maxPages) {
       observer.unobserve(guard);
