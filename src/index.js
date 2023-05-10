@@ -6,8 +6,8 @@ import 'simplelightbox/dist/simple-lightbox.min.css';
 import { search } from './helpers/search';
 import { createMarkUp } from './helpers/createMarkUp';
 import { scroll } from './helpers/scroll';
-import { onClick } from './helpers/onClick';
-
+// import { onClick } from './helpers/onClick';
+import { startMarkUp } from './helpers/startMarkUp';
 
 const form = document.querySelector('.search-form');
 const gallery = document.querySelector('.gallery');
@@ -33,18 +33,23 @@ gallery.addEventListener('click', onClick);
 const maxPages = 12;
 let currentPage = 1;
 let query = '';
-
+console.log(query);
+startMarkUp();
 
 async function onSubmit(evt) {
   evt.preventDefault();
   query = evt.target.elements.searchQuery.value.trim();
-  gallery.innerHTML = '';
+  console.log(query);
   currentPage = 1;
     observer.unobserve(guard);
-  if (query === '') {
+    if (!query) {
+        
+        Notiflix.Notify.failure(
+      'Sorry, there are no images matching your search query. Please try again.'
+    )
     return;
     }
-    
+    gallery.innerHTML = '';
   const imagies = await search(query, currentPage);
 
   if (!imagies.hits.length) {
@@ -79,6 +84,15 @@ async function onPagination(entries, observer) {
       observer.unobserve(guard);
     }
   });
+}
+
+
+function onClick(event) {
+  event.preventDefault();
+  if (!event.target.classList.contains('gallery__image')) {
+    return;
+  }
+  lightbox.open();
 }
 
 
