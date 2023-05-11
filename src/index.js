@@ -34,7 +34,8 @@ const maxPages = 12;
 let currentPage = 1;
 let query = '';
 console.log(query);
-startMarkUp();
+
+// startMarkUp(gallery, guard);
 
 async function onSubmit(evt) {
   evt.preventDefault();
@@ -66,7 +67,7 @@ async function onSubmit(evt) {
   lightbox.refresh();
   observer.observe(guard);
 
-    scroll();
+    // scroll();
 }
 
 async function onPagination(entries, observer) {
